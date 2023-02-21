@@ -15,7 +15,10 @@
 
             # Minimize config
             ({ config, pkgs, ... }: {
-              imports = [ (nixpkgs + "/nixos/modules/profiles/minimal.nix") ];
+              imports = [
+                (nixpkgs + "/nixos/modules/profiles/minimal.nix")
+                (nixpkgs + "/nixos/modules/profiles/headless.nix")
+              ];
               services.udisks2.enable = false;
               programs.command-not-found.enable = false;
             })
@@ -27,16 +30,11 @@
               users.users.root.password = "1234";
 
               networking.firewall.enable = false;
-              services.nginx = {
+
+              services.iperf3 = {
                 enable = true;
-                defaultHTTPListenPort = 3333;
-                virtualHosts.default = {
-                  default = true;
-                  root = "/";
-                  extraConfig = ''
-                    autoindex on;
-                  '';
-                };
+                verbose = true;
+                port = 3333;
               };
             })
           ];
@@ -60,7 +58,8 @@
             type = "app";
             program = toString (pkgs.writeShellScript "run-docker.sh" ''
               docker run \
-                -ti \
+                --tty \
+                --interactive \
                 --privileged \
                 -p 3333:3333 \
                 $(docker load < "${
