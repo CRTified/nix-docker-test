@@ -13,6 +13,13 @@
             # Required to boot without defining file systems
             ({ config, pkgs, ... }: { boot.isContainer = true; })
 
+            # Minimize config
+            ({ config, pkgs, ... }: {
+              imports = [ (nixpkgs + "/nixos/modules/profiles/minimal.nix") ];
+              services.udisks2.enable = false;
+              programs.command-not-found.enable = false;
+            })
+
             # Demo Application
             ({ config, pkgs, ... }: {
               system.stateVersion = "23.05";
